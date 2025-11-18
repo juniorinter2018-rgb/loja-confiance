@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Pedido Confirmado! | Confiance</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --pessego: #FFDAB9; --rosa-antigo: #C08081;
+            --texto-escuro: #3E3B3B; --fundo-site: #F9F4EF;
+            --fundo-card: #FFFEFA;
+        }
+        body { font-family: 'Lato', sans-serif; background-color: var(--fundo-site); color: var(--texto-escuro); text-align: center; padding: 50px 20px; }
+        .card-sucesso {
+            background: var(--fundo-card); max-width: 600px; margin: 0 auto;
+            padding: 60px 40px; border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(192, 128, 129, 0.15);
+        }
+        h1 { font-family: 'Cormorant Garamond', serif; color: var(--rosa-antigo); font-size: 3rem; margin-bottom: 10px; }
+        .icon-check { font-size: 5rem; color: #4CAF50; margin-bottom: 20px; display: block; }
+        p { font-size: 1.2rem; margin-bottom: 30px; color: #666; }
+        .btn-home {
+            display: inline-block; padding: 15px 40px;
+            background-color: var(--rosa-antigo); color: white;
+            text-decoration: none; font-weight: bold; text-transform: uppercase;
+            letter-spacing: 1px; border-radius: 30px; transition: 0.3s;
+        }
+        .btn-home:hover { background-color: #a06061; }
+    </style>
+</head>
+<body>
+
+    <div class="card-sucesso">
+        <span class="icon-check">✅</span>
+        <h1>Obrigado pela sua compra!</h1>
+        <p>O seu pagamento foi processado com sucesso.<br>Você receberá um e-mail com os detalhes do pedido em breve.</p>
+        
+        <a href="/" class="btn-home">Continuar Comprando</a>
+    </div>
+
+    <script>
+        // LIMPAR CARRINHO AUTOMATICAMENTE
+        // Como o pagamento foi sucesso, removemos os itens salvos no navegador
+        localStorage.removeItem('carrinho_confiance');
+        console.log("Carrinho limpo com sucesso!");
+    </script>
+
+</body>
+</html>

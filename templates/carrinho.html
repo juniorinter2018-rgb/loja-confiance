@@ -6,12 +6,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 
     <style>
-        /* --- PALETA VISUAL CONFIANCE --- */
+        /* --- PALETA VISUAL CONFIANCE (MANTIDA) --- */
         :root {
             --pessego: #FFDAB9; --rosa-antigo: #C08081; --ciano: #E0FFFF;
             --texto-escuro: #3E3B3B; --fundo-site: #F9F4EF; --fundo-card: #FFFEFA;
             --sombra: rgba(192, 128, 129, 0.15); --borda: rgba(0,0,0,0.05);
-            --verde-zap: #25D366; --verde-zap-hover: #128C7E;
+            --verde-zap: #25D366; --verde-zap-hover: #128C7E; /* Mantido para não quebrar outros estilos */
+            --azul-mp: #009EE3; /* Cor do Mercado Pago */
+            --azul-mp-hover: #007ab0;
         }
 
         body.dark-mode {
@@ -28,7 +30,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; transition: background-color 0.3s, color 0.3s; }
         body { font-family: 'Lato', sans-serif; color: var(--texto-escuro); background-color: var(--fundo-site); }
 
-        /* --- HEADER PADRÃO (Idêntico à Home) --- */
+        /* --- HEADER PADRÃO (MANTIDO) --- */
         .top-bar { background-color: black; color: white; text-align: center; padding: 8px 0; font-size: 0.85rem; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; }
         
         nav { display: flex; justify-content: space-between; align-items: center; padding: 15px 5%; background-color: var(--fundo-card); border-bottom: 1px solid rgba(0,0,0,0.05); gap: 30px; position: sticky; top: 0; z-index: 100; }
@@ -44,7 +46,7 @@
         .nav-right { display: flex; gap: 25px; align-items: center; flex-shrink: 0; }
         .icon-group { display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--texto-escuro); font-size: 0.85rem; line-height: 1.2; text-decoration: none; }
         
-        /* ESTILO DOS ÍCONES SVG (Para ficarem iguais à home) */
+        /* ESTILO DOS ÍCONES SVG */
         .icon-group svg { width: 24px; height: 24px; stroke-width: 2; }
         
         .icon-text { display: block; font-weight: bold; }
@@ -84,7 +86,7 @@
         
         .item-price { font-weight: bold; font-size: 1.2rem; color: var(--texto-escuro); }
 
-        /* Resumo (Direita) - ESTILO BOUTIQUE */
+        /* Resumo (Direita) */
         .cart-summary {
             background: var(--fundo-card); padding: 35px; border-radius: 4px;
             box-shadow: 0 10px 30px var(--sombra); height: fit-content; 
@@ -125,16 +127,19 @@
             color: var(--rosa-antigo); font-family: 'Cormorant Garamond', serif;
         }
 
+        /* Botão Mercado Pago (Estilo MP, como solicitado) */
         .btn-checkout {
             display: flex; align-items: center; justify-content: center; gap: 10px;
             width: 100%; padding: 18px; margin-top: 30px;
-            background-color: var(--verde-zap); color: white; 
-            border: none; border-radius: 30px; /* Botão redondo moderno */
+            background-color: var(--azul-mp); 
+            color: white; 
+            border: none; border-radius: 30px; 
             text-transform: uppercase; font-weight: bold; letter-spacing: 1px; 
             cursor: pointer; transition: 0.3s; font-size: 1rem;
-            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+            box-shadow: 0 4px 15px rgba(0, 158, 227, 0.3);
         }
-        .btn-checkout:hover { background-color: var(--verde-zap-hover); transform: translateY(-2px); }
+        .btn-checkout:hover { background-color: var(--azul-mp-hover); transform: translateY(-2px); }
+        .btn-checkout:disabled { background-color: #ccc; cursor: not-allowed; transform: none; }
 
         .empty-cart { text-align: center; padding: 80px 20px; grid-column: 1 / -1; color: #888; }
         
@@ -208,7 +213,14 @@
 
     <script>
         const STATIC_PATH = "/static/";
-        let carrinhoAtual = JSON.parse(localStorage.getItem('carrinho_confiance') || '[]');
+        
+        // 1. LÓGICA ROBUSTA: Filtra itens nulos ou inválidos (correção do erro 'Cannot read properties of null')
+        let carrinhoRaw = JSON.parse(localStorage.getItem('carrinho_confiance') || '[]');
+        let carrinhoAtual = carrinhoRaw.filter(item => item && item.id); 
+        if(carrinhoRaw.length !== carrinhoAtual.length) {
+            localStorage.setItem('carrinho_confiance', JSON.stringify(carrinhoAtual));
+        }
+        
         let freteSelecionado = 0; 
         let freteNome = "";
 
@@ -276,9 +288,10 @@
                     <div class="summary-total"><span>Total</span><span id="total-final">R$ ${totalFinal.toFixed(2)}</span></div>
                     <div style="margin-top: 10px; font-size: 0.9rem; color: #666; text-align:right;">ou 6x de R$ ${(totalFinal/6).toFixed(2)} sem juros</div>
 
-                    <button class="btn-checkout" onclick="finalizarWhatsApp(${subtotal})">
-                        Finalizar no WhatsApp 📱
+                    <button class="btn-checkout" onclick="pagarComMercadoPago()">
+                        Pagar com Mercado Pago 💳
                     </button>
+                    <div style="text-align:center; font-size:0.8rem; color:#999; margin-top:10px;">Compra 100% Segura</div>
                 </div>
             `;
 
@@ -331,18 +344,52 @@
         window.selecionarFrete = function(radio) {
             freteSelecionado = parseFloat(radio.value);
             freteNome = radio.getAttribute('data-nome');
-            renderCart(); // Re-renderiza para atualizar totais
+            renderCart(); 
         };
 
-        window.finalizarWhatsApp = function(subtotalInicial) {
+        // --- FUNÇÃO MERCADO PAGO (Nova) ---
+        window.pagarComMercadoPago = async function() {
             if (carrinhoAtual.length === 0) return;
-            if (subtotalInicial < 279 && freteSelecionado === 0) { alert("Selecione o frete."); return; }
             
-            let msg = "*Novo Pedido - Confiance*\n----------------\n";
-            carrinhoAtual.forEach(i => msg += `▪ ${i.nome} - R$ ${i.preco.toFixed(2)}\n`);
-            msg += `\n📦 Frete: ${subtotalInicial >= 279 ? 'GRÁTIS' : 'R$ '+freteSelecionado.toFixed(2)}`;
-            msg += `\n💰 *Total: R$ ${(subtotalInicial + freteSelecionado).toFixed(2)}*`;
-            window.open(`https://wa.me/5583987922924?text=${encodeURIComponent(msg)}`, '_blank');
+            // Validação de Frete
+            let subtotal = carrinhoAtual.reduce((acc, item) => acc + item.preco, 0);
+            if (subtotal < 279 && freteSelecionado === 0) { 
+                alert("Por favor, selecione uma opção de frete antes de pagar."); 
+                return; 
+            }
+
+            const btn = document.querySelector('.btn-checkout');
+            btn.innerText = "Gerando pagamento...";
+            btn.disabled = true;
+
+            const dadosPedido = {
+                itens: carrinhoAtual,
+                frete: freteSelecionado
+            };
+
+            try {
+                const response = await fetch('/api/criar-pagamento', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dadosPedido)
+                });
+
+                const data = await response.json();
+
+                if (data.link) {
+                    // Sucesso: Redireciona para o MP
+                    window.location.href = data.link;
+                } else {
+                    alert("Erro: " + (data.erro || "Desconhecido"));
+                    btn.innerText = "Pagar com Mercado Pago 💳";
+                    btn.disabled = false;
+                }
+            } catch (error) {
+                console.error("Erro:", error);
+                alert("Erro de conexão com o servidor.");
+                btn.innerText = "Pagar com Mercado Pago 💳";
+                btn.disabled = false;
+            }
         };
 
         renderCart();
