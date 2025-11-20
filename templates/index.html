@@ -128,14 +128,21 @@
 
     <nav>
         <a href="/" class="brand-link"><img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo-img"><span class="brand-name">Confiance</span></a>
-        <form action="/" method="GET" class="search-box"><input type="text" name="q" class="search-input" placeholder="Busque por produto..." value="{{ busca_atual or '' }}"><button type="submit" class="search-btn">🔍</button></form>
+        <form action="/" method="GET" class="search-box"><input type="text" name="q" class="search-input" placeholder="Busque por produto..." value="{{ busca_atual or '' }}"><button type="submit" class="search-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </button></form>
         <div class="nav-right">
-            <div class="icon-group">👤<div><span class="icon-sub">Entre ou cadastre-se</span><span class="icon-text">Minha Conta</span></div></div>
+            <div class="icon-group">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                <div><span class="icon-sub">Entre ou cadastre-se</span><span class="icon-text">Minha Conta</span></div>
+            </div>
             <a href="/favoritos" class="icon-group">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
                 <div><span class="icon-sub">Confira seus</span><span class="icon-text">Favoritos</span></div>
             </a>
-            <a href="/carrinho" class="icon-group">🛍️</a>
+            <a href="/carrinho" class="icon-group">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+            </a>
             <button class="btn-theme" id="theme-toggle">🌙</button>
         </div>
     </nav>
