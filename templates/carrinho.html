@@ -6,12 +6,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 
     <style>
-        /* --- PALETA VISUAL CONFIANCE --- */
+        /* --- PALETA VISUAL CONFIANCE (ORIGINAL MANTIDA) --- */
         :root {
             --pessego: #FFDAB9; --rosa-antigo: #C08081; --ciano: #E0FFFF;
             --texto-escuro: #3E3B3B; --fundo-site: #F9F4EF; --fundo-card: #FFFEFA;
             --sombra: rgba(192, 128, 129, 0.15); --borda: rgba(0,0,0,0.05);
-            --verde-zap: #25D366; --verde-zap-hover: #128C7E; /* Cores WhatsApp */
+            --verde-zap: #25D366; --verde-zap-hover: #128C7E;
+            /* Nova cor apenas para o botão MP, sem afetar o resto */
+            --azul-mp: #009EE3; 
         }
 
         body.dark-mode {
@@ -43,10 +45,7 @@
 
         .nav-right { display: flex; gap: 25px; align-items: center; flex-shrink: 0; }
         .icon-group { display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--texto-escuro); font-size: 0.85rem; line-height: 1.2; text-decoration: none; }
-        
-        /* ESTILO DOS ÍCONES SVG */
         .icon-group svg { width: 24px; height: 24px; stroke-width: 2; }
-        
         .icon-text { display: block; font-weight: bold; }
         .icon-sub { font-size: 0.75rem; font-weight: normal; display: block; color: #888; }
         @media(max-width: 1000px) { .icon-text, .icon-sub { display: none; } }
@@ -58,88 +57,59 @@
 
         /* --- LAYOUT CARRINHO --- */
         .container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
-        
-        .page-title { 
-            font-family: 'Cormorant Garamond', serif; font-size: 2.5rem; 
-            margin-bottom: 30px; color: var(--rosa-antigo);
-            border-bottom: 1px solid var(--borda); padding-bottom: 15px;
-        }
-
+        .page-title { font-family: 'Cormorant Garamond', serif; font-size: 2.5rem; margin-bottom: 30px; color: var(--rosa-antigo); border-bottom: 1px solid var(--borda); padding-bottom: 15px; }
         .cart-grid { display: grid; grid-template-columns: 1.8fr 1fr; gap: 40px; }
         @media(max-width: 900px) { .cart-grid { grid-template-columns: 1fr; } }
 
         /* Lista de Itens */
         .cart-items-container { display: flex; flex-direction: column; gap: 20px; }
-        
-        .cart-item {
-            display: flex; align-items: center; background: var(--fundo-card); padding: 20px;
-            border-radius: 4px; box-shadow: 0 5px 15px var(--sombra); border: 1px solid var(--borda);
-        }
+        .cart-item { display: flex; align-items: center; background: var(--fundo-card); padding: 20px; border-radius: 4px; box-shadow: 0 5px 15px var(--sombra); border: 1px solid var(--borda); }
         .item-img { width: 90px; height: 110px; object-fit: cover; border-radius: 4px; margin-right: 20px; }
-        
         .item-details { flex-grow: 1; }
         .item-name { font-weight: bold; font-size: 1.2rem; font-family: 'Cormorant Garamond', serif; margin-bottom: 5px; }
         .item-meta { font-size: 0.9rem; color: #888; margin-bottom: 8px; }
         .btn-remove { color: #D32F2F; font-size: 0.8rem; cursor: pointer; text-decoration: underline; border: none; background: none; padding: 0; }
-        
         .item-price { font-weight: bold; font-size: 1.2rem; color: var(--texto-escuro); }
 
-        /* Resumo (Direita) - ESTILO BOUTIQUE */
-        .cart-summary {
-            background: var(--fundo-card); padding: 35px; border-radius: 4px;
-            box-shadow: 0 10px 30px var(--sombra); height: fit-content; 
-            border: 1px solid var(--borda); position: sticky; top: 120px;
-        }
-        .summary-title { 
-            font-size: 1.8rem; font-family: 'Cormorant Garamond', serif; 
-            margin-bottom: 25px; border-bottom: 1px solid #eee; padding-bottom: 15px;
-            color: var(--texto-escuro);
-        }
-        
+        /* Resumo (Direita) */
+        .cart-summary { background: var(--fundo-card); padding: 35px; border-radius: 4px; box-shadow: 0 10px 30px var(--sombra); height: fit-content; border: 1px solid var(--borda); position: sticky; top: 120px; }
+        .summary-title { font-size: 1.8rem; font-family: 'Cormorant Garamond', serif; margin-bottom: 25px; border-bottom: 1px solid #eee; padding-bottom: 15px; color: var(--texto-escuro); }
         .summary-row { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 1rem; color: #555; }
         
-        /* Frete Calculadora Estilizada */
+        /* Frete */
         .frete-calculator { margin: 25px 0; border-top: 1px dashed #ddd; border-bottom: 1px dashed #ddd; padding: 20px 0; }
         .cep-input-group { display: flex; gap: 5px; margin-bottom: 10px; }
-        #cep-carrinho { 
-            flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px; 
-            background: white; color: var(--texto-escuro);
-        }
-        .btn-ok-frete { 
-            background: var(--texto-escuro); color: white; border: none; 
-            padding: 0 20px; border-radius: 4px; cursor: pointer; font-weight: bold;
-        }
-        
+        #cep-carrinho { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px; background: white; color: var(--texto-escuro); }
+        .btn-ok-frete { background: var(--texto-escuro); color: white; border: none; padding: 0 20px; border-radius: 4px; cursor: pointer; font-weight: bold; }
         .frete-options { margin-top: 15px; display: flex; flex-direction: column; gap: 10px; }
-        .frete-radio-label { 
-            display: flex; justify-content: space-between; cursor: pointer; align-items: center; 
-            padding: 10px; border-radius: 4px; transition: background 0.2s; font-size: 0.9rem;
-        }
+        .frete-radio-label { display: flex; justify-content: space-between; cursor: pointer; align-items: center; padding: 10px; border-radius: 4px; transition: background 0.2s; font-size: 0.9rem; }
         .frete-radio-label:hover { background: rgba(0,0,0,0.03); }
         .frete-radio-label input { margin-right: 10px; accent-color: var(--rosa-antigo); }
 
-        /* Total e Botão */
-        .summary-total { 
-            display: flex; justify-content: space-between; margin-top: 20px; padding-top: 20px; 
-            border-top: 1px solid #ddd; font-weight: bold; font-size: 1.6rem; 
-            color: var(--rosa-antigo); font-family: 'Cormorant Garamond', serif;
-        }
+        .summary-total { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 20px; border-top: 1px solid #ddd; font-weight: bold; font-size: 1.6rem; color: var(--rosa-antigo); font-family: 'Cormorant Garamond', serif; }
 
-        /* Botão WhatsApp (Original) */
+        /* --- BOTÕES DE AÇÃO (Atualizado com cuidado) --- */
         .btn-checkout {
             display: flex; align-items: center; justify-content: center; gap: 10px;
-            width: 100%; padding: 18px; margin-top: 30px;
+            width: 100%; padding: 18px; margin-top: 15px;
             background-color: var(--verde-zap); color: white; 
-            border: none; border-radius: 30px; /* Botão redondo moderno */
-            text-transform: uppercase; font-weight: bold; letter-spacing: 1px; 
-            cursor: pointer; transition: 0.3s; font-size: 1rem;
-            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+            border: none; border-radius: 30px; text-transform: uppercase; font-weight: bold; letter-spacing: 1px; 
+            cursor: pointer; transition: 0.3s; font-size: 1rem; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
         }
         .btn-checkout:hover { background-color: var(--verde-zap-hover); transform: translateY(-2px); }
-        .btn-checkout:disabled { background-color: #ccc; cursor: not-allowed; transform: none; }
+        
+        /* Botão do Mercado Pago (Estilo similar ao original, mas azul) */
+        .btn-mp {
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            width: 100%; padding: 18px; margin-top: 30px; /* Mais margem no topo */
+            background-color: var(--azul-mp); color: white;
+            border: none; border-radius: 30px; text-transform: uppercase; font-weight: bold; letter-spacing: 1px;
+            cursor: pointer; transition: 0.3s; font-size: 1rem; box-shadow: 0 4px 15px rgba(0, 158, 227, 0.3);
+        }
+        .btn-mp:hover { filter: brightness(0.9); transform: translateY(-2px); }
+        .btn-mp:disabled { background-color: #ccc; cursor: not-allowed; }
 
         .empty-cart { text-align: center; padding: 80px 20px; grid-column: 1 / -1; color: #888; }
-        
         footer { background-color: var(--fundo-card); text-align: center; padding: 40px; border-top: 5px solid var(--rosa-antigo); margin-top: 60px; color: #888; font-size: 0.9rem; }
         .orcamento a { color: var(--rosa-antigo); font-weight: bold; }
     </style>
@@ -163,24 +133,15 @@
         <div class="nav-right">
             <div class="icon-group">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                <div>
-                    <span class="icon-sub">Entre ou cadastre-se</span>
-                    <span class="icon-text">Minha Conta</span>
-                </div>
+                <div><span class="icon-sub">Entre ou cadastre-se</span><span class="icon-text">Minha Conta</span></div>
             </div>
-
             <div class="icon-group">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-                <div>
-                     <span class="icon-sub">Confira seus</span>
-                     <span class="icon-text">Favoritos</span>
-                </div>
+                <div><span class="icon-sub">Confira seus</span><span class="icon-text">Favoritos</span></div>
             </div>
-
             <a href="/carrinho" class="icon-group">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
             </a>
-
             <button class="btn-theme" id="theme-toggle">🌙</button>
         </div>
     </nav>
@@ -198,9 +159,7 @@
 
     <div class="container">
         <h1 class="page-title">Minha Sacola</h1>
-        
-        <div class="cart-grid" id="cart-content">
-            </div>
+        <div class="cart-grid" id="cart-content"></div>
     </div>
 
     <footer>
@@ -228,7 +187,6 @@
             carrinhoAtual.forEach((item, index) => {
                 subtotal += item.preco;
                 let imgSrc = item.imagem.startsWith('http') ? item.imagem : STATIC_PATH + item.imagem;
-                
                 itemsHTML += `
                     <div class="cart-item">
                         <img src="${imgSrc}" class="item-img">
@@ -242,10 +200,8 @@
             });
             itemsHTML += '</div>';
 
-            // Frete Grátis Check
             let textoFreteResumo = 'A calcular';
             let areaFreteHTML = '';
-            
             if (subtotal >= 279) {
                 freteSelecionado = 0; freteNome = "Frete Grátis"; textoFreteResumo = '<span style="color:green; font-weight:bold">GRÁTIS</span>';
                 areaFreteHTML = `<div style="margin:20px 0; padding:15px; background:#E8F5E9; color:#2E7D32; border-radius:4px; text-align:center;">🎉 <strong>Parabéns!</strong> Frete Grátis garantido.</div>`;
@@ -278,6 +234,10 @@
                     <div class="summary-total"><span>Total</span><span id="total-final">R$ ${totalFinal.toFixed(2)}</span></div>
                     <div style="margin-top: 10px; font-size: 0.9rem; color: #666; text-align:right;">ou 6x de R$ ${(totalFinal/6).toFixed(2)} sem juros</div>
 
+                    <button class="btn-mp" onclick="finalizarMercadoPago(${subtotal})">
+                        Pagar com Mercado Pago 💳
+                    </button>
+
                     <button class="btn-checkout" onclick="finalizarWhatsApp(${subtotal})">
                         Finalizar no WhatsApp 📱
                     </button>
@@ -309,22 +269,14 @@
             const divOpcoes = document.getElementById('opcoes-frete');
             if (cep.length < 8) return;
             divOpcoes.innerHTML = "Calculando...";
-
             try {
                 const response = await fetch('/api/calcular-frete', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ cep: cep }) });
                 const opcoes = await response.json();
-                
                 if(opcoes.length === 0) { divOpcoes.innerHTML = "Nenhuma opção."; return; }
-
                 let html = '';
                 opcoes.forEach((opt) => {
                     let precoFloat = parseFloat(opt.preco);
-                    html += `
-                        <label class="frete-radio-label">
-                            <div><input type="radio" name="frete" value="${precoFloat}" data-nome="${opt.servico}" onchange="selecionarFrete(this)">
-                            <strong>${opt.servico}</strong> <small>(${opt.prazo})</small></div>
-                            <div>R$ ${opt.preco}</div>
-                        </label>`;
+                    html += `<label class="frete-radio-label"><div><input type="radio" name="frete" value="${precoFloat}" data-nome="${opt.servico}" onchange="selecionarFrete(this)"><strong>${opt.servico}</strong> <small>(${opt.prazo})</small></div><div>R$ ${opt.preco}</div></label>`;
                 });
                 divOpcoes.innerHTML = html;
             } catch (e) { divOpcoes.innerHTML = "Erro."; }
@@ -333,18 +285,47 @@
         window.selecionarFrete = function(radio) {
             freteSelecionado = parseFloat(radio.value);
             freteNome = radio.getAttribute('data-nome');
-            renderCart(); // Re-renderiza para atualizar totais
+            renderCart();
         };
 
         window.finalizarWhatsApp = function(subtotalInicial) {
             if (carrinhoAtual.length === 0) return;
             if (subtotalInicial < 279 && freteSelecionado === 0) { alert("Selecione o frete."); return; }
-            
             let msg = "*Novo Pedido - Confiance*\n----------------\n";
             carrinhoAtual.forEach(i => msg += `▪ ${i.nome} - R$ ${i.preco.toFixed(2)}\n`);
             msg += `\n📦 Frete: ${subtotalInicial >= 279 ? 'GRÁTIS' : 'R$ '+freteSelecionado.toFixed(2)}`;
             msg += `\n💰 *Total: R$ ${(subtotalInicial + freteSelecionado).toFixed(2)}*`;
             window.open(`https://wa.me/5583987922924?text=${encodeURIComponent(msg)}`, '_blank');
+        };
+
+        // --- NOVA FUNÇÃO MERCADO PAGO ---
+        window.finalizarMercadoPago = async function(subtotalInicial) {
+            if (subtotalInicial < 279 && freteSelecionado === 0) { 
+                alert("Por favor, calcule e selecione o frete antes de pagar."); 
+                return; 
+            }
+            const btn = document.querySelector('.btn-mp');
+            const textoOriginal = btn.innerHTML;
+            btn.innerHTML = "Processando...";
+            btn.disabled = true;
+
+            try {
+                const response = await fetch('/api/checkout-mp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ carrinho: carrinhoAtual, frete: freteSelecionado })
+                });
+                const data = await response.json();
+                if (data.link_pagamento) {
+                    window.location.href = data.link_pagamento;
+                } else {
+                    alert("Erro: " + (data.erro || "Desconhecido"));
+                    btn.innerHTML = textoOriginal; btn.disabled = false;
+                }
+            } catch (error) {
+                alert("Erro de conexão.");
+                btn.innerHTML = textoOriginal; btn.disabled = false;
+            }
         };
 
         renderCart();
