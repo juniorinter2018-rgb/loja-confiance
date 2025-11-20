@@ -64,7 +64,11 @@
         .vendidos { color: #888; font-size: 0.9rem; }
         .nota { font-weight: bold; color: var(--texto-escuro); }
 
-        .preco-main { font-size: 3rem; font-weight: bold; color: var(--rosa-antigo); margin: 10px 0; }
+        /* Preços Ancorados */
+        .preco-wrapper { display: flex; align-items: baseline; gap: 15px; margin: 10px 0; }
+        .preco-ancora { text-decoration: line-through; color: #999; font-size: 1.2rem; }
+        .preco-main { font-size: 3rem; font-weight: bold; color: var(--rosa-antigo); }
+        
         .parcelamento-main { font-size: 1.1rem; color: #888; margin-bottom: 30px; }
         .descricao p { margin-bottom: 20px; font-size: 1rem; color: var(--texto-escuro); }
 
@@ -75,6 +79,19 @@
 
         .btn-comprar { display: block; width: 100%; padding: 18px 0; background-color: var(--rosa-antigo); color: white; text-align: center; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; border: none; border-radius: 4px; cursor: pointer; font-size: 1.1rem; transition: background 0.3s; }
         .btn-comprar:hover { filter: brightness(0.9); }
+        
+        /* Mensagem de Escassez (Aversão à Perda) */
+        .escassez-msg {
+            color: var(--vermelho-promo);
+            font-size: 0.95rem;
+            margin-top: 10px;
+            text-align: center;
+            background-color: rgba(211, 47, 47, 0.1);
+            padding: 8px;
+            border-radius: 4px;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.8; } 100% { opacity: 1; } }
 
         footer { background-color: var(--fundo-card); text-align: center; padding: 40px; border-top: 5px solid var(--rosa-antigo); margin-top: 40px; color: #888; font-size: 0.9rem; }
         .orcamento a { color: var(--rosa-antigo); font-weight: bold; }
@@ -114,7 +131,13 @@
 
                 <div class="descricao"><p>{{ produto.descricao }}</p></div>
 
-                <div class="preco-main">R$ {{ "%.2f"|format(produto.preco) }}</div>
+                <div class="preco-wrapper">
+                    {% if produto.preco_original %}
+                        <span class="preco-ancora">R$ {{ "%.2f"|format(produto.preco_original) }}</span>
+                    {% endif %}
+                    <div class="preco-main">R$ {{ "%.2f"|format(produto.preco) }}</div>
+                </div>
+
                 <div class="parcelamento-main">ou 6x de R$ {{ "%.2f"|format(produto.preco / 6) }} sem juros</div>
                 
                 <div class="opcoes-cor">
@@ -130,6 +153,10 @@
                 </div>
 
                 <button class="btn-comprar" id="add-to-cart">Adicionar ao Carrinho</button>
+                
+                <div class="escassez-msg">
+                    🔥 Restam apenas <strong>3 unidades</strong> neste preço promocional!
+                </div>
             </div>
         </div>
     </div>

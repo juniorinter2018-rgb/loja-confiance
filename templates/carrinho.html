@@ -59,7 +59,15 @@
 
         /* --- LAYOUT CARRINHO --- */
         .container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
-        .page-title { font-family: 'Cormorant Garamond', serif; font-size: 2.5rem; margin-bottom: 30px; color: var(--rosa-antigo); border-bottom: 1px solid var(--borda); padding-bottom: 15px; }
+        .page-title { font-family: 'Cormorant Garamond', serif; font-size: 2.5rem; margin-bottom: 20px; color: var(--rosa-antigo); border-bottom: 1px solid var(--borda); padding-bottom: 15px; }
+        
+        /* PROGRESS BAR (Viés do Custo Afundado) */
+        .progress-container { width: 100%; max-width: 600px; margin: 0 auto 40px auto; }
+        .progress-labels { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.85rem; color: #aaa; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+        .label-active { color: var(--rosa-antigo); }
+        .progress-track { width: 100%; height: 6px; background-color: #eee; border-radius: 3px; overflow: hidden; }
+        .progress-fill { width: 50%; height: 100%; background-color: var(--rosa-antigo); }
+
         .cart-grid { display: grid; grid-template-columns: 1.8fr 1fr; gap: 40px; }
         @media(max-width: 900px) { .cart-grid { grid-template-columns: 1fr; } }
 
@@ -160,6 +168,17 @@
     </div>
 
     <div class="container">
+        <div class="progress-container">
+            <div class="progress-labels">
+                <span class="label-active">1. Sacola</span>
+                <span>2. Identificação</span>
+                <span>3. Pagamento</span>
+            </div>
+            <div class="progress-track">
+                <div class="progress-fill"></div>
+            </div>
+        </div>
+
         <h1 class="page-title">Minha Sacola</h1>
         <div class="cart-grid" id="cart-content"></div>
     </div>
@@ -238,11 +257,11 @@
                     <div style="margin-top: 10px; font-size: 0.9rem; color: #666; text-align:right;">ou 6x de R$ ${(totalFinal/6).toFixed(2)} sem juros</div>
 
                     <button class="btn-mp" onclick="finalizarMercadoPago(${subtotal})">
-                        Pagar
+                        Pagar com Mercado Pago 💳
                     </button>
 
                     <button class="btn-checkout" onclick="finalizarWhatsApp(${subtotal})">
-                        Finalizar no WhatsApp 
+                        Finalizar no WhatsApp 📱
                     </button>
                 </div>
             `;

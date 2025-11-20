@@ -14,12 +14,12 @@ CEP_ORIGEM = "58985000"
 BASE_URL = os.getenv("SITE_URL", "http://localhost:5000")
 sdk = mercadopago.SDK(MP_ACCESS_TOKEN)
 
-# --- DADOS DOS PRODUTOS ---
+# --- DADOS DOS PRODUTOS COM VIÉS DE ANCORAGEM ---
 PRODUTOS = [
-    { "id": 101, "nome": "Blusa de Seda Bege", "preco": 189.90, "imagem": 'blusa_seda.jpg', "descricao": "Blusa sofisticada.", "cores": ["#FFDAB9", "#C08081"], "vendidos": 432, "nota": 4.9, "peso": 0.3, "altura": 4, "largura": 12, "comprimento": 17 },
-    { "id": 102, "nome": "Calça Pantalona Preta", "preco": 229.00, "imagem": 'pantalona.jpg', "descricao": "Calça de corte amplo.", "cores": ["#3E3B3B", "#FFFFFF"], "vendidos": 128, "nota": 4.8, "peso": 0.5, "altura": 5, "largura": 20, "comprimento": 25 },
-    { "id": 103, "nome": "Vestido Midi Estampado", "preco": 299.90, "imagem": 'vestido_midi.jpg', "descricao": "Vestido midi exclusivo.", "cores": ["#C08081", "#E0FFFF"], "vendidos": 850, "nota": 5.0, "peso": 0.4, "altura": 5, "largura": 20, "comprimento": 20 },
-    { "id": 104, "nome": "Saia Lápis Xadrez", "preco": 165.50, "imagem": 'saia_lapis.jpg', "descricao": "Saia lápis clássica.", "cores": ["#3E3B3B", "#C08081"], "vendidos": 65, "nota": 4.7, "peso": 0.3, "altura": 4, "largura": 15, "comprimento": 20 },
+    { "id": 101, "nome": "Blusa de Seda Bege", "preco_original": 259.90, "preco": 189.90, "imagem": 'blusa_seda.jpg', "descricao": "Blusa sofisticada.", "cores": ["#FFDAB9", "#C08081"], "vendidos": 432, "nota": 4.9, "peso": 0.3, "altura": 4, "largura": 12, "comprimento": 17 },
+    { "id": 102, "nome": "Calça Pantalona Preta", "preco_original": 299.90, "preco": 229.00, "imagem": 'pantalona.jpg', "descricao": "Calça de corte amplo.", "cores": ["#3E3B3B", "#FFFFFF"], "vendidos": 128, "nota": 4.8, "peso": 0.5, "altura": 5, "largura": 20, "comprimento": 25 },
+    { "id": 103, "nome": "Vestido Midi Estampado", "preco_original": 399.90, "preco": 299.90, "imagem": 'vestido_midi.jpg', "descricao": "Vestido midi exclusivo.", "cores": ["#C08081", "#E0FFFF"], "vendidos": 850, "nota": 5.0, "peso": 0.4, "altura": 5, "largura": 20, "comprimento": 20 },
+    { "id": 104, "nome": "Saia Lápis Xadrez", "preco_original": 219.50, "preco": 165.50, "imagem": 'saia_lapis.jpg', "descricao": "Saia lápis clássica.", "cores": ["#3E3B3B", "#C08081"], "vendidos": 65, "nota": 4.7, "peso": 0.3, "altura": 4, "largura": 15, "comprimento": 20 },
 ]
 
 @app.route('/')
