@@ -181,10 +181,16 @@
             }
 
             let subtotal = 0;
+            let temProdutoTeste = false; // Variável para controle do produto teste
+
             let itemsHTML = '<div class="cart-items-container">';
             
             carrinhoAtual.forEach((item, index) => {
                 subtotal += item.preco;
+                
+                // DETETA SE É O PRODUTO TESTE (ID 105)
+                if (item.id === 105) { temProdutoTeste = true; }
+
                 let imgSrc = item.imagem.startsWith('http') ? item.imagem : STATIC_PATH + item.imagem;
                 itemsHTML += `
                     <div class="cart-item">
@@ -201,9 +207,17 @@
 
             let textoFreteResumo = 'A calcular';
             let areaFreteHTML = '';
-            if (subtotal >= 279) {
-                freteSelecionado = 0; freteNome = "Frete Grátis"; textoFreteResumo = '<span style="color:green; font-weight:bold">GRÁTIS</span>';
-                areaFreteHTML = `<div style="margin:20px 0; padding:15px; background:#E8F5E9; color:#2E7D32; border-radius:4px; text-align:center;">🎉 <strong>Parabéns!</strong> Frete Grátis garantido.</div>`;
+
+            // LÓGICA ATUALIZADA: Subtotal >= 279 OU Produto Teste
+            if (subtotal >= 279 || temProdutoTeste) {
+                freteSelecionado = 0; 
+                freteNome = "Frete Grátis"; 
+                textoFreteResumo = '<span style="color:green; font-weight:bold">GRÁTIS</span>';
+                
+                // Mensagem personalizada
+                let msgFrete = temProdutoTeste ? "🎁 Item de teste detectado (Frete Grátis)" : "🎉 <strong>Parabéns!</strong> Frete Grátis garantido.";
+
+                areaFreteHTML = `<div style="margin:20px 0; padding:15px; background:#E8F5E9; color:#2E7D32; border-radius:4px; text-align:center;">${msgFrete}</div>`;
             } else {
                 textoFreteResumo = freteSelecionado > 0 ? `R$ ${freteSelecionado.toFixed(2)}` : 'A calcular';
                 areaFreteHTML = `
@@ -289,16 +303,23 @@
 
         window.finalizarWhatsApp = function(subtotalInicial) {
             if (carrinhoAtual.length === 0) return;
-            if (subtotalInicial < 279 && freteSelecionado === 0) { alert("Selecione o frete."); return; }
+            
+            // Se o frete for grátis ou já estiver selecionado, permite passar
+            const freteEhGratis = subtotalInicial >= 279 || carrinhoAtual.some(item => item.id === 105);
+            
+            if (!freteEhGratis && freteSelecionado === 0) { alert("Selecione o frete."); return; }
+            
             let msg = "*Novo Pedido - Confiance*\n----------------\n";
             carrinhoAtual.forEach(i => msg += `▪ ${i.nome} - R$ ${i.preco.toFixed(2)}\n`);
-            msg += `\n📦 Frete: ${subtotalInicial >= 279 ? 'GRÁTIS' : 'R$ '+freteSelecionado.toFixed(2)}`;
+            msg += `\n📦 Frete: ${freteEhGratis ? 'GRÁTIS' : 'R$ '+freteSelecionado.toFixed(2)}`;
             msg += `\n💰 *Total: R$ ${(subtotalInicial + freteSelecionado).toFixed(2)}*`;
             window.open(`https://wa.me/5583987922924?text=${encodeURIComponent(msg)}`, '_blank');
         };
 
         window.finalizarMercadoPago = async function(subtotalInicial) {
-            if (subtotalInicial < 279 && freteSelecionado === 0) { 
+            const freteEhGratis = subtotalInicial >= 279 || carrinhoAtual.some(item => item.id === 105);
+
+            if (!freteEhGratis && freteSelecionado === 0) { 
                 alert("Por favor, calcule e selecione o frete antes de pagar."); 
                 return; 
             }

@@ -20,6 +20,8 @@ PRODUTOS = [
     { "id": 102, "nome": "Calça Pantalona Preta", "preco": 229.00, "imagem": 'pantalona.jpg', "descricao": "Calça de corte amplo.", "cores": ["#3E3B3B", "#FFFFFF"], "vendidos": 128, "nota": 4.8, "peso": 0.5, "altura": 5, "largura": 20, "comprimento": 25 },
     { "id": 103, "nome": "Vestido Midi Estampado", "preco": 299.90, "imagem": 'vestido_midi.jpg', "descricao": "Vestido midi exclusivo.", "cores": ["#C08081", "#E0FFFF"], "vendidos": 850, "nota": 5.0, "peso": 0.4, "altura": 5, "largura": 20, "comprimento": 20 },
     { "id": 104, "nome": "Saia Lápis Xadrez", "preco": 165.50, "imagem": 'saia_lapis.jpg', "descricao": "Saia lápis clássica.", "cores": ["#3E3B3B", "#C08081"], "vendidos": 65, "nota": 4.7, "peso": 0.3, "altura": 4, "largura": 15, "comprimento": 20 },
+    # NOVO PRODUTO DE TESTE
+    { "id": 105, "nome": "Produto Teste", "preco": 1.00, "imagem": 'teste.png', "descricao": "Item exclusivo para testes de fluxo de caixa e frete.", "cores": ["#CCCCCC"], "vendidos": 0, "nota": 5.0, "peso": 0.1, "altura": 5, "largura": 10, "comprimento": 15 }
 ]
 
 @app.route('/')
