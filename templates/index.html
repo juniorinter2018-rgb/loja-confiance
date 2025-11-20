@@ -12,7 +12,7 @@
         :root {
             --pessego: #FFDAB9;
             --rosa-antigo: #C08081;
-            --ciano: #E0FFFF;
+            --ciano: #BBDDE6; /* COR ATUALIZADA: Azul-Esverdeado Pastel */
             --texto-escuro: #3E3B3B;
             --fundo-site: #F9F4EF; 
             --fundo-card: #FFFEFA;
@@ -137,8 +137,25 @@
         .section-title { text-align: center; font-size: 2.5rem; color: var(--rosa-antigo); margin-bottom: 40px; }
         .grid-produtos { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 40px; }
 
-        .card { background: var(--fundo-card); border: 1px solid var(--borda); transition: all 0.4s ease; }
+        .card { background: var(--fundo-card); border: 1px solid var(--borda); transition: all 0.4s ease; position: relative; }
         .card:hover { box-shadow: 0 15px 30px var(--sombra); transform: translateY(-5px); }
+        
+        /* BOTÃO FAVORITAR NO CARD */
+        .btn-fav-card {
+            position: absolute;
+            top: 15px; right: 15px;
+            background: white; border: none; border-radius: 50%;
+            width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            z-index: 10;
+            transition: transform 0.2s;
+        }
+        .btn-fav-card:hover { transform: scale(1.1); }
+        .btn-fav-card svg { fill: none; stroke: var(--texto-escuro); transition: fill 0.3s, stroke 0.3s; }
+        .btn-fav-card.favoritado svg { fill: #D32F2F; stroke: #D32F2F; }
+
         .img-container { overflow: hidden; height: 400px; background-color: #333; position: relative; }
         .card img { width: 100%; height: auto; object-fit: cover; transition: transform 0.6s ease; }
         .card:hover img { transform: scale(1.05); }
@@ -146,7 +163,6 @@
         .info { padding: 20px; text-align: center; }
         .nome-produto { font-size: 1.1rem; margin-bottom: 5px; font-weight: 400; }
         
-        /* ESTILOS NOVOS: PROVA SOCIAL */
         .social-proof {
             display: flex; justify-content: center; align-items: center; gap: 8px;
             margin-bottom: 10px; font-size: 0.8rem;
@@ -154,25 +170,10 @@
         .stars { color: var(--dourado-estrela); letter-spacing: 1px; font-size: 0.9rem; }
         .vendidos { color: #888; font-weight: normal; }
 
-        /* VIÉS DE ANCORAGEM: Estilos para preços */
-        .preco-container {
-            display: flex;
-            justify-content: center;
-            align-items: baseline;
-            gap: 10px;
-            margin-bottom: 2px;
-        }
-        .preco-ancora {
-            text-decoration: line-through;
-            color: #999;
-            font-size: 0.9rem;
-        }
-        .preco-real {
-            color: var(--rosa-antigo);
-            font-size: 1.3rem;
-            font-weight: bold;
-            font-family: 'Cormorant Garamond', serif;
-        }
+        /* PREÇOS */
+        .preco-container { display: flex; justify-content: center; align-items: baseline; gap: 10px; margin-bottom: 2px; }
+        .preco-ancora { text-decoration: line-through; color: #999; font-size: 0.9rem; }
+        .preco-real { color: var(--rosa-antigo); font-size: 1.3rem; font-weight: bold; font-family: 'Cormorant Garamond', serif; }
 
         .parcelamento { font-size: 0.85rem; color: #888; margin-bottom: 15px; font-weight: 400; }
 
@@ -209,10 +210,10 @@
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                 <div><span class="icon-sub">Entre ou cadastre-se</span><span class="icon-text">Minha Conta</span></div>
             </div>
-            <div class="icon-group">
+            <a href="/favoritos" class="icon-group">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
                 <div><span class="icon-sub">Confira seus</span><span class="icon-text">Favoritos</span></div>
-            </div>
+            </a>
             <a href="/carrinho" class="icon-group">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
             </a>
@@ -263,6 +264,10 @@
         <div class="grid-produtos">
             {% for item in produtos %}
             <div class="card">
+                <button class="btn-fav-card" onclick='toggleFavorito({{ item | tojson }})' data-id="{{ item.id }}">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                </button>
+
                 <div class="img-container">
                     <img src="{{ url_for('static', filename=item.imagem) }}" alt="{{ item.nome }}">
                 </div>
@@ -327,6 +332,36 @@
             if (body.classList.contains('dark-mode')) { localStorage.setItem('theme', 'dark'); toggleBtn.innerText = '☀️'; }
             else { localStorage.setItem('theme', 'light'); toggleBtn.innerText = '🌙'; }
         });
+
+        // --- LÓGICA DE FAVORITOS ---
+        function toggleFavorito(produto) {
+            let favoritos = JSON.parse(localStorage.getItem('favoritos_confiance') || '[]');
+            const index = favoritos.findIndex(item => item.id === produto.id);
+            
+            const btn = document.querySelector(`button[data-id="${produto.id}"]`);
+            
+            if (index === -1) {
+                // Adicionar
+                favoritos.push(produto);
+                if(btn) btn.classList.add('favoritado');
+            } else {
+                // Remover
+                favoritos.splice(index, 1);
+                if(btn) btn.classList.remove('favoritado');
+            }
+            localStorage.setItem('favoritos_confiance', JSON.stringify(favoritos));
+        }
+
+        function carregarFavoritosHome() {
+            let favoritos = JSON.parse(localStorage.getItem('favoritos_confiance') || '[]');
+            favoritos.forEach(item => {
+                const btn = document.querySelector(`button[data-id="${item.id}"]`);
+                if(btn) btn.classList.add('favoritado');
+            });
+        }
+        
+        // Inicializar corações ao carregar
+        document.addEventListener('DOMContentLoaded', carregarFavoritosHome);
     </script>
 </body>
 </html>

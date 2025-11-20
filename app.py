@@ -14,7 +14,7 @@ CEP_ORIGEM = "58985000"
 BASE_URL = os.getenv("SITE_URL", "http://localhost:5000")
 sdk = mercadopago.SDK(MP_ACCESS_TOKEN)
 
-# --- DADOS DOS PRODUTOS COM VIÉS DE ANCORAGEM ---
+# --- DADOS DOS PRODUTOS ---
 PRODUTOS = [
     { "id": 101, "nome": "Blusa de Seda Bege", "preco_original": 259.90, "preco": 189.90, "imagem": 'blusa_seda.jpg', "descricao": "Blusa sofisticada.", "cores": ["#FFDAB9", "#C08081"], "vendidos": 432, "nota": 4.9, "peso": 0.3, "altura": 4, "largura": 12, "comprimento": 17 },
     { "id": 102, "nome": "Calça Pantalona Preta", "preco_original": 299.90, "preco": 229.00, "imagem": 'pantalona.jpg', "descricao": "Calça de corte amplo.", "cores": ["#3E3B3B", "#FFFFFF"], "vendidos": 128, "nota": 4.8, "peso": 0.5, "altura": 5, "largura": 20, "comprimento": 25 },
@@ -41,6 +41,10 @@ def detalhes_produto(id_produto):
 @app.route('/carrinho')
 def carrinho():
     return render_template('carrinho.html')
+
+@app.route('/favoritos')
+def favoritos():
+    return render_template('favoritos.html')
 
 @app.route('/sucesso')
 def sucesso():
@@ -82,7 +86,6 @@ def criar_pagamento_mp():
                 "failure": f"{BASE_URL}/carrinho",
                 "pending": f"{BASE_URL}/carrinho"
             }
-            # Sem auto_return para evitar erros de redirecionamento
         }
 
         resposta = sdk.preference().create(preference_data)
@@ -98,42 +101,23 @@ def criar_pagamento_mp():
         print("ERRO SERVIDOR:", e)
         return jsonify({'erro': str(e)}), 500
 
-
-# --- NOVA ROTA: WEBHOOK (O MERCADO PAGO CHAMA AQUI) ---
+# --- ROTA WEBHOOK ---
 @app.route('/api/webhook', methods=['POST'])
 def webhook():
     try:
         data = request.get_json()
-        
-        # O MP pode mandar vários tipos de notificação. Queremos "payment"
         if data.get("action") == "payment.created" or data.get("action") == "payment.updated" or data.get("type") == "payment":
-            
-            # Pega o ID do pagamento dentro do JSON
             payment_id = data.get("data", {}).get("id")
-            
             if payment_id:
-                # SEGURANÇA: Nunca confie só no JSON. Consulte a API do MP para ver o status real.
                 pagamento_info = sdk.payment().get(payment_id)
-                
                 if pagamento_info["status"] == 200:
                     status_atual = pagamento_info["response"]["status"]
                     valor_pago = pagamento_info["response"]["transaction_amount"]
-                    
                     print(f"🔔 WEBHOOK: Pagamento {payment_id} está: {status_atual} | Valor: {valor_pago}")
-                    
-                    if status_atual == "approved":
-                        print("✅ PAGAMENTO APROVADO! LIBERAR PEDIDO!")
-                        # AQUI VOCÊ SALVARIA NO BANCO DE DADOS QUE O PEDIDO FOI PAGO
-                    
-                    elif status_atual == "rejected":
-                        print("❌ Pagamento recusado.")
-
         return jsonify({"status": "ok"}), 200
-
     except Exception as e:
         print("Erro no Webhook:", e)
         return jsonify({"error": str(e)}), 500
-
 
 # --- API FRETE MELHOR ENVIO ---
 @app.route('/api/calcular-frete', methods=['POST'])

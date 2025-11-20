@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Meus Favoritos | Confiance</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --pessego: #FFDAB9; --rosa-antigo: #C08081; 
+            --ciano: #BBDDE6; /* COR ATUALIZADA */
+            --texto-escuro: #3E3B3B; --fundo-site: #F9F4EF; --fundo-card: #FFFEFA;
+            --sombra: rgba(192, 128, 129, 0.15); --borda: rgba(0,0,0,0.05);
+        }
+        body.dark-mode {
+            --pessego: #A07060; --rosa-antigo: #D09091; --ciano: #2F4F4F;
+            --texto-escuro: #E0E0E0; --fundo-site: #121212; --fundo-card: #1E1E1E;
+        }
+        /* Reutilizando estilos básicos do index.html */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Lato', sans-serif; color: var(--texto-escuro); background-color: var(--fundo-site); }
+        .top-bar { background-color: black; color: white; text-align: center; padding: 8px 0; font-size: 0.85rem; font-weight: bold; text-transform: uppercase; }
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 15px 5%; background-color: var(--fundo-card); }
+        .brand-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+        .logo-img { height: 50px; }
+        .brand-name { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: bold; color: var(--rosa-antigo); text-transform: uppercase; }
+        
+        .container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+        .page-title { font-family: 'Cormorant Garamond', serif; font-size: 2.5rem; color: var(--rosa-antigo); margin-bottom: 30px; border-bottom: 1px solid var(--borda); }
+        
+        .grid-produtos { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 30px; }
+        .card { background: var(--fundo-card); border: 1px solid var(--borda); position: relative; }
+        .img-container { height: 300px; overflow: hidden; }
+        .card img { width: 100%; height: 100%; object-fit: cover; }
+        .info { padding: 15px; text-align: center; }
+        .nome { font-weight: bold; margin-bottom: 5px; }
+        .preco { color: var(--rosa-antigo); font-weight: bold; font-size: 1.2rem; margin-bottom: 10px; }
+        
+        .btn-remove {
+            position: absolute; top: 10px; right: 10px;
+            background: white; border: none; border-radius: 50%; width: 30px; height: 30px;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .btn-ver { display: block; width: 100%; padding: 10px; background: transparent; border: 1px solid var(--texto-escuro); color: var(--texto-escuro); text-decoration: none; text-transform: uppercase; font-size: 0.8rem; margin-top: 10px; }
+        .btn-ver:hover { background: var(--rosa-antigo); border-color: var(--rosa-antigo); color: white; }
+
+        .empty-msg { text-align: center; padding: 50px; color: #888; }
+        footer { background-color: var(--fundo-card); text-align: center; padding: 40px; margin-top: 40px; border-top: 5px solid var(--rosa-antigo); }
+    </style>
+</head>
+<body>
+    <div class="top-bar">Seus itens mais desejados</div>
+    <nav>
+        <a href="/" class="brand-link">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo-img">
+            <span class="brand-name">Confiance</span>
+        </a>
+        <a href="/" style="font-weight:bold; text-decoration:underline;">Voltar à Loja</a>
+    </nav>
+
+    <div class="container">
+        <h1 class="page-title">Meus Favoritos ❤️</h1>
+        <div id="fav-grid" class="grid-produtos"></div>
+    </div>
+
+    <footer>
+        <p>CATRACA GROUP &copy; 2025</p>
+    </footer>
+
+    <script>
+        const STATIC_PATH = "/static/";
+        
+        function renderFavoritos() {
+            const container = document.getElementById('fav-grid');
+            const favoritos = JSON.parse(localStorage.getItem('favoritos_confiance') || '[]');
+
+            if (favoritos.length === 0) {
+                container.innerHTML = `<div class="empty-msg"><h3>Você ainda não favoritou nenhum item.</h3><br><a href="/">Ir às compras</a></div>`;
+                return;
+            }
+
+            let html = '';
+            favoritos.forEach((item, index) => {
+                let imgSrc = item.imagem.startsWith('http') ? item.imagem : STATIC_PATH + item.imagem;
+                html += `
+                <div class="card">
+                    <button class="btn-remove" onclick="removerFavorito(${index})">✕</button>
+                    <div class="img-container"><img src="${imgSrc}"></div>
+                    <div class="info">
+                        <div class="nome">${item.nome}</div>
+                        <div class="preco">R$ ${item.preco.toFixed(2)}</div>
+                        <a href="/produto/${item.id}" class="btn-ver">Ver Detalhes</a>
+                    </div>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        function removerFavorito(index) {
+            let favoritos = JSON.parse(localStorage.getItem('favoritos_confiance') || '[]');
+            favoritos.splice(index, 1);
+            localStorage.setItem('favoritos_confiance', JSON.stringify(favoritos));
+            renderFavoritos();
+        }
+
+        document.addEventListener('DOMContentLoaded', renderFavoritos);
+    </script>
+</body>
+</html>
