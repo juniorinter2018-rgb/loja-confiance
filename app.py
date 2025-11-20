@@ -1,18 +1,17 @@
 from flask import Flask, render_template, request, jsonify
 import requests
-import mercadopago
+# import mercadopago  <-- REMOVIDO
 
 app = Flask(__name__)
 
-# --- CONFIGURAÇÃO DO MERCADO PAGO ---
-# Token das suas Credenciais de Teste
-sdk = mercadopago.SDK("APP_USR-8814551838479613-111816-1b1e31b43ac2a560e07659c410db9259-2917963396")
-
-# --- CONFIGURAÇÃO MELHOR ENVIO ---
+# --- CONFIGURAÇÃO DO MELHOR ENVIO ---
+# Token fornecido por você (mantido)
 TOKEN_MELHOR_ENVIO = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiZGUyNzExODI1NjZiYjhhYjFiYTI1OTgwY2U3YzZiN2U4NjJmN2I5MmEzMzNjMWE0ZjgwZDI4NmU2ZDEyMjVkNDFmNGYyNDhlNTk3Yjc2ZDgiLCJpYXQiOjE3NjM0OTQzMTUuMjYzNzk3LCJuYmYiOjE3NjM0OTQzMTUuMjYzNzk4LCJleHAiOjE3OTUwMzAzMTUuMjUwNTQ1LCJzdWIiOiJhMDYzN2ZhNi05NmI2LTQ3NzEtOWQxZi0wZGE4NzgxOTdkMWYiLCJzY29wZXMiOlsiY2FydC1yZWFkIiwiY2FydC13cml0ZSIsImNvbXBhbmllcy1yZWFkIiwiY291cG9ucy1yZWFkIiwiY291cG9ucy13cml0ZSIsIm5vdGlmaWNhdGlvbnMtcmVhZCIsIm9yZGVycy1yZWFkIiwicHJvZHVjdHMtcmVhZCIsInByb2R1Y3RzLWRlc3Ryb3kiLCJwcm9kdWN0cy13cml0ZSIsInB1cmNoYXNlcy1yZWFkIiwic2hpcHBpbmctY2FsY3VsYXRlIiwic2hpcHBpbmctY2FuY2VsIiwic2hpcHBpbmctY2hlY2tvdXQiLCJzaGlwcGluZy1jb21wYW5pZXMiLCJzaGlwcGluZy1nZW5lcmF0ZSIsInNoaXBwaW5nLXByZXZpZXciLCJzaGlwcGluZy1wcmludCIsInNoaXBwaW5nLXNoYXJlIiwic2hpcHBpbmctdHJhY2tpbmciLCJlY29tbWVyY2Utc2hpcHBpbmciLCJ0cmFuc2FjdGlvbnMtcmVhZCIsInVzZXJzLXJlYWQiLCJ1c2Vycy13cml0ZSIsIndlYmhvb2tzLXJlYWQiLCJ3ZWJob29rcy13cml0ZSIsIndlYmhvb2tzLWRlbGV0ZSIsInRkZWFsZXItd2ViaG9vayJdfQ.trKjLJ9rZZyrpRDEpDSzz-LdEFlrjiZRMNFOOP3MQO1RUmprD1y9cHIt0waCHrWXxLWmP8L_rYrYoWeYrIzovGhdMkCbsc68Pusl2eYR2cUjJMc_zS2om_SUDJbOyo2xNCliybQP5nithlVeuU3jX_0xDGm3snqcCE0zg9U1mt4inEOUVnUSZrTStKI82H2i8A7tAv4KRu0ZlpgUoxB44eNc9hWf9roe-38oqJUDYRHrTMPCKXJ4isteeUxUYfH1zegLaI5T9ydjUJEPHaXl-X4IcdC0Ea5dv1Xxz2IghH6VsdYpYYaJ7SR7APUTqEFoiKtwGE-n-752c3X6DQyF4JsBblIVP7SuUfiHPuSi-ayR9Bxr8EiYNsDGFR8C8yD7W7unBhFBHRxcs63nYSbjHdvLi2CFmNMAEs1j_Ps-o2uHHYlGn9a8GseZ_xXFrl3PM9wfvHemlinDgIQQvO2o4sG8svay4Tiqy-Ercm3RLJ0ueEEDff9S4LxBnacOqBDQ2rzoYt8Fo6KdLl3EWl3REnb4DBfMk0Ufp5s6vrxb7MjpmV29d86xCbeqS4H1Cj4e8RHz3NiTHKPdMlfCUbEvU61NWJHxLH_5CAyp5hpqNI4PCSlYG7oekSQoQ1kAAMdj9-ix-dmyibqXcdfWdrw9LzFOCO39O300tCp-fPz-fW4"
+
+# CEP de Origem (Santana de Mangueira - PB):
 CEP_ORIGEM = "58985000"
 
-# --- DADOS DOS PRODUTOS ---
+# --- DADOS DOS PRODUTOS (Com nomes de arquivos locais) ---
 PRODUTOS = [
     {
         "id": 101, "nome": "Blusa de Seda Bege", "preco": 189.90, "imagem": 'blusa_seda.jpg',
@@ -65,82 +64,7 @@ def detalhes_produto(id_produto):
 def carrinho():
     return render_template('carrinho.html')
 
-# --- ROTAS DE RETORNO ---
-@app.route('/sucesso')
-def sucesso():
-    # Renderiza a página bonita que limpa o carrinho
-    return render_template('sucesso.html')
-
-@app.route('/pendente')
-def pendente():
-    return "<h1>Pagamento Pendente ⏳</h1><p>Estamos aguardando a confirmação.</p><a href='/'>Voltar à loja</a>"
-
-@app.route('/falha')
-def falha():
-    return "<h1>Pagamento Falhou ❌</h1><p>Houve um problema. Tente novamente.</p><a href='/carrinho'>Voltar ao Carrinho</a>"
-
-
-# --- API MERCADO PAGO ---
-@app.route('/api/criar-pagamento', methods=['POST'])
-def criar_pagamento():
-    dados = request.get_json()
-    carrinho_cliente = dados.get('itens', [])
-    frete_valor = float(dados.get('frete', 0))
-    
-    items_preference = []
-    
-    for item_cli in carrinho_cliente:
-        produto_db = next((p for p in PRODUTOS if p['id'] == int(item_cli['id'])), None)
-        if produto_db:
-            items_preference.append({
-                "id": str(produto_db['id']),
-                "title": produto_db['nome'],
-                "quantity": 1,
-                "unit_price": float(produto_db['preco']),
-                "currency_id": "BRL",
-                "picture_url": f"https://seusite.com/static/{produto_db['imagem']}",
-                "description": f"Cor: {item_cli.get('corSelecionada', 'Padrão')}"
-            })
-            
-    if frete_valor > 0:
-        items_preference.append({
-            "title": "Frete e Envio",
-            "quantity": 1,
-            "unit_price": frete_valor,
-            "currency_id": "BRL"
-        })
-
-    preference_data = {
-        "items": items_preference,
-        # "auto_return": "approved",  <-- REMOVIDO: CAUSA ERRO EM LOCALHOST
-        "back_urls": {
-            "success": "http://localhost:5000/sucesso",
-            "failure": "http://localhost:5000/falha",
-            "pending": "http://localhost:5000/pendente"
-        },
-        "statement_descriptor": "CONFIANCE"
-    }
-
-    try:
-        preference_response = sdk.preference().create(preference_data)
-        preference = preference_response["response"]
-
-        print("------------------------------------------------")
-        print(f"STATUS MP: {preference_response.get('status')}")
-        
-        if preference_response["status"] == 201:
-            print(f"LINK GERADO: {preference['sandbox_init_point']}")
-            return jsonify({"link": preference["sandbox_init_point"]})
-        else:
-            print("ERRO MP:", preference)
-            return jsonify({"erro": preference.get("message", "Erro desconhecido")}), 400
-
-    except Exception as e:
-        print(f"ERRO GERAL: {e}")
-        return jsonify({"erro": str(e)}), 500
-
-
-# --- API MELHOR ENVIO ---
+# --- API CÁLCULO DE FRETE MELHOR ENVIO (MANTIDO) ---
 @app.route('/api/calcular-frete', methods=['POST'])
 def calcular_frete():
     data = request.get_json()
