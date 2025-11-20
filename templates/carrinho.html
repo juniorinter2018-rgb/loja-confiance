@@ -6,13 +6,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 
     <style>
-        /* --- PALETA VISUAL CONFIANCE (ORIGINAL MANTIDA) --- */
+        /* --- PALETA VISUAL CONFIANCE (MANTIDA) --- */
         :root {
             --pessego: #FFDAB9; --rosa-antigo: #C08081; --ciano: #E0FFFF;
             --texto-escuro: #3E3B3B; --fundo-site: #F9F4EF; --fundo-card: #FFFEFA;
             --sombra: rgba(192, 128, 129, 0.15); --borda: rgba(0,0,0,0.05);
             --verde-zap: #25D366; --verde-zap-hover: #128C7E;
-            /* Nova cor apenas para o botão MP, sem afetar o resto */
             --azul-mp: #009EE3; 
         }
 
@@ -30,7 +29,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; transition: background-color 0.3s, color 0.3s; }
         body { font-family: 'Lato', sans-serif; color: var(--texto-escuro); background-color: var(--fundo-site); }
 
-        /* --- HEADER PADRÃO (Idêntico à Home) --- */
+        /* --- HEADER PADRÃO (IGUAL À HOME) --- */
         .top-bar { background-color: black; color: white; text-align: center; padding: 8px 0; font-size: 0.85rem; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; }
         
         nav { display: flex; justify-content: space-between; align-items: center; padding: 15px 5%; background-color: var(--fundo-card); border-bottom: 1px solid rgba(0,0,0,0.05); gap: 30px; position: sticky; top: 0; z-index: 100; }
@@ -45,7 +44,7 @@
 
         .nav-right { display: flex; gap: 25px; align-items: center; flex-shrink: 0; }
         .icon-group { display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--texto-escuro); font-size: 0.85rem; line-height: 1.2; text-decoration: none; }
-        .icon-group svg { width: 24px; height: 24px; stroke-width: 2; }
+        .icon-group svg { width: 24px; height: 24px; stroke-width: 2; } /* Garante o tamanho do SVG */
         .icon-text { display: block; font-weight: bold; }
         .icon-sub { font-size: 0.75rem; font-weight: normal; display: block; color: #888; }
         @media(max-width: 1000px) { .icon-text, .icon-sub { display: none; } }
@@ -88,7 +87,7 @@
 
         .summary-total { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 20px; border-top: 1px solid #ddd; font-weight: bold; font-size: 1.6rem; color: var(--rosa-antigo); font-family: 'Cormorant Garamond', serif; }
 
-        /* --- BOTÕES DE AÇÃO (Atualizado com cuidado) --- */
+        /* Botões de Ação */
         .btn-checkout {
             display: flex; align-items: center; justify-content: center; gap: 10px;
             width: 100%; padding: 18px; margin-top: 15px;
@@ -98,10 +97,9 @@
         }
         .btn-checkout:hover { background-color: var(--verde-zap-hover); transform: translateY(-2px); }
         
-        /* Botão do Mercado Pago (Estilo similar ao original, mas azul) */
         .btn-mp {
             display: flex; align-items: center; justify-content: center; gap: 10px;
-            width: 100%; padding: 18px; margin-top: 30px; /* Mais margem no topo */
+            width: 100%; padding: 18px; margin-top: 30px;
             background-color: var(--azul-mp); color: white;
             border: none; border-radius: 30px; text-transform: uppercase; font-weight: bold; letter-spacing: 1px;
             cursor: pointer; transition: 0.3s; font-size: 1rem; box-shadow: 0 4px 15px rgba(0, 158, 227, 0.3);
@@ -117,6 +115,7 @@
 <body>
 
     <div class="top-bar">Frete grátis em compras acima de R$ 279</div>
+    
     <nav>
         <a href="/" class="brand-link">
             <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo-img">
@@ -298,7 +297,6 @@
             window.open(`https://wa.me/5583987922924?text=${encodeURIComponent(msg)}`, '_blank');
         };
 
-        // --- NOVA FUNÇÃO MERCADO PAGO ---
         window.finalizarMercadoPago = async function(subtotalInicial) {
             if (subtotalInicial < 279 && freteSelecionado === 0) { 
                 alert("Por favor, calcule e selecione o frete antes de pagar."); 
