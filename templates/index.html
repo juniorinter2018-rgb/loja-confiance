@@ -169,7 +169,7 @@
 <body>
 
     <div class="top-bar">
-        Frete grátis em compras acima de R$ 279
+        Frete grátis em compras acima de R$ 279,99
     </div>
 
     <nav>
@@ -258,7 +258,7 @@
                     <div class="preco">R$ {{ "%.2f"|format(item.preco) }}</div>
                     <div class="parcelamento">ou 6x de R$ {{ "%.2f"|format(item.preco / 6) }}</div>
                     
-                    <a href="/produto/{{ item.id }}" class="btn-ver">Ver Detalhes</a>
+                    <a href="/produto/{{ item.id }}" class="btn-ver">comprar</a>
                 </div>
             </div>
             {% else %}
