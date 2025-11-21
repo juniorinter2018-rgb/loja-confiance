@@ -6,9 +6,11 @@ import mercadopago
 app = Flask(__name__)
 
 # --- CONFIGURAÇÕES ---
-# Token de Produção
+# Token de Produção do Mercado Pago
 MP_ACCESS_TOKEN = "APP_USR-2045481871192189-112010-1b7034c359c46bcc392d95626b6bfdb0-269196602"
-TOKEN_MELHOR_ENVIO = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiZGUyNzExODI1NjZiYjhhYjFiYTI1OTgwY2U3YzZiN2U4NjJmN2I5MmEzMzNjMWE0ZjgwZDI4NmU2ZDEyMjVkNDFmNGYyNDhlNTk3Yjc2ZDgiLCJpYXQiOjE3NjM0OTQzMTUuMjYzNzk3LCJuYmYiOjE3NjM0OTQzMTUuMjYzNzk4LCJleHAiOjE3OTUwMzAzMTUuMjUwNTQ1LCJzdWIiOiJhMDYzN2ZhNi05NmI2LTQ3NzEtOWQxZi0wZGE4NzgxOTdkMWYiLCJzY29wZXMiOlsiY2FydC1yZWFkIiwiY2FydC13cml0ZSIsImNvbXBhbmllcy1yZWFkIiwiY291cG9ucy1yZWFkIiwiY291cG9ucy13cml0ZSIsIm5vdGlmaWNhdGlvbnMtcmVhZCIsIm9yZGVycy1yZWFkIiwicHJvZHVjdHMtcmVhZCIsInByb2R1Y3RzLWRlc3Ryb3kiLCJwcm9kdWN0cy13cml0ZSIsInB1cmNoYXNlcy1yZWFkIiwic2hpcHBpbmctY2FsY3VsYXRlIiwic2hpcHBpbmctY2FuY2VsIiwic2hpcHBpbmctY2hlY2tvdXQiLCJzaGlwcGluZy1jb21wYW5pZXMiLCJzaGlwcGluZy1nZW5lcmF0ZSIsInNoaXBwaW5nLXByZXZpZXciLCJzaGlwcGluZy1wcmludCIsInNoaXBwaW5nLXNoYXJlIiwic2hpcHBpbmctdHJhY2tpbmciLCJlY29tbWVyY2Utc2hpcHBpbmciLCJ0cmFuc2FjdGlvbnMtcmVhZCIsInVzZXJzLXJlYWQiLCJ1c2Vycy13cml0ZSIsIndlYmhvb2tzLXJlYWQiLCJ3ZWJob29rcy13cml0ZSIsIndlYmhvb2tzLWRlbGV0ZSIsInRkZWFsZXItd2ViaG9vayJdfQ.trKjLJ9rZZyrpRDEpDSzz-LdEFlrjiZRMNFOOP3MQO1RUmprD1y9cHIt0waCHrWXxLWmP8L_rYrYoWeYrIzovGhdMkCbsc68Pusl2eYR2cUjJMc_zS2om_SUDJbOyo2xNCliybQP5nithlVeuU3jX_0xDGm3snqcCE0zg9U1mt4inEOUVnUSZrTStKI82H2i8A7tAv4KRu0ZlpgUoxB44eNc9hWf9roe-38oqJUDYRHrTMPCKXJ4isteeUxUYfH1zegLaI5T9ydjUJEPHaXl-X4IcdC0Ea5dv1Xxz2IghH6VsdYpYYaJ7SR7APUTqEFoiKtwGE-n-752c3X6DQyF4JsBblIVP7SuUfiHPuSi-ayR9Bxr8EiYNsDGFR8C8yD7W7unBhFBHRxcs63nYSbjHdvLi2CFmNMAEs1j_Ps-o2uHHYlGn9a8GseZ_xXFrl3PM9wfvHemlinDgIQQvO2o4sG8svay4Tiqy-Ercm3RLJ0ueEEDff9S4LxBnacOqBDQ2rzoYt8Fo6KdLl3EWl3REnb4DBfMk0Ufp5s6vrxb7MjpmV29d86xCbeqS4H1Cj4e8RHz3NiTHKPdMlfCUbEvU61NWJHxLH_5CAyp5hpqNI4PCSlYG7oekSQoQ1kAAMdj9-ix-dmyibqXcdfWdrw9LzFOCO39O300tCp-fPz-fW4"
+
+# Token do Melhor Envio (Atualizado)
+TOKEN_MELHOR_ENVIO = "rbermXVJIBsVCsmmG4SvYNamoN5i5Q96JlMs7XFf"
 CEP_ORIGEM = "58985000"
 
 BASE_URL = os.getenv("SITE_URL", "http://localhost:5000")
@@ -119,7 +121,7 @@ def webhook():
         print("Erro no Webhook:", e)
         return jsonify({"error": str(e)}), 500
 
-# --- API FRETE MELHOR ENVIO ---
+# --- API FRETE MELHOR ENVIO (CORRIGIDA) ---
 @app.route('/api/calcular-frete', methods=['POST'])
 def calcular_frete():
     data = request.get_json()
@@ -138,24 +140,40 @@ def calcular_frete():
             'Authorization': f'Bearer {TOKEN_MELHOR_ENVIO}',
             'User-Agent': 'Loja Confiance'
         }
+        # Payload fixo para teste (ajustar conforme necessidade real dos produtos)
         payload = {
             "from": {"postal_code": CEP_ORIGEM},
             "to": {"postal_code": cep_destino},
             "products": [{"id": "x", "width": 15, "height": 5, "length": 20, "weight": 0.3, "insurance_value": 50.0, "quantity": 1}]
         }
+        
         response = requests.post(url, json=payload, headers=headers, timeout=10)
+        
+        # --- DEBUG NO TERMINAL ---
+        if response.status_code != 200:
+            print(f"❌ ERRO MELHOR ENVIO (Status {response.status_code}):")
+            print(response.text)
+        # -------------------------
+
         if response.status_code == 200:
             dados_api = response.json()
             for frete in dados_api:
-                if "error" not in frete and "price" in frete and "Correios" in frete.get('company', {}).get('name', ''):
+                # Lógica corrigida para ser case-insensitive
+                nome_empresa = frete.get('company', {}).get('name', '').lower()
+                
+                if "error" not in frete and "price" in frete and "correios" in nome_empresa:
                     opcoes.append({
                         'servico': frete['name'],
                         'preco': f"{float(frete['price']):.2f}",
                         'prazo': f"{frete['delivery_time']} dias",
                         'obs': frete['company']['name']
                     })
+        
         return jsonify(opcoes)
+        
     except Exception as e:
+        print(f"❌ EXCEÇÃO AO CALCULAR FRETE: {str(e)}")
+        # Fallback para não travar a venda
         opcoes.append({'servico': 'PAC (Simulado)', 'preco': '25.90', 'prazo': '8 dias', 'obs': 'Correios'})
         return jsonify(opcoes)
 
