@@ -1,6 +1,5 @@
 import os
 from flask import Flask, render_template, request, jsonify
-import requests
 import mercadopago
 
 app = Flask(__name__)
@@ -8,10 +7,6 @@ app = Flask(__name__)
 # --- CONFIGURAÇÕES ---
 # Token de Produção do Mercado Pago
 MP_ACCESS_TOKEN = "APP_USR-2045481871192189-112010-1b7034c359c46bcc392d95626b6bfdb0-269196602"
-
-# Token do Melhor Envio (Atualizado)
-TOKEN_MELHOR_ENVIO = "rbermXVJIBsVCsmmG4SvYNamoN5i5Q96JlMs7XFf"
-CEP_ORIGEM = "58985000"
 
 BASE_URL = os.getenv("SITE_URL", "http://localhost:5000")
 sdk = mercadopago.SDK(MP_ACCESS_TOKEN)
@@ -121,61 +116,24 @@ def webhook():
         print("Erro no Webhook:", e)
         return jsonify({"error": str(e)}), 500
 
-# --- API FRETE MELHOR ENVIO (CORRIGIDA) ---
+# --- API FRETE MANUAL (SIMPLIFICADA) ---
 @app.route('/api/calcular-frete', methods=['POST'])
 def calcular_frete():
+    # Apenas verifica se o CEP foi enviado, mas não calcula nada externamente
     data = request.get_json()
     cep_destino = data.get('cep', '').replace('-', '').replace('.', '')
     
     if not cep_destino or len(cep_destino) != 8:
         return jsonify({'erro': 'CEP inválido'}), 400
 
-    opcoes = [{'servico': 'Retirada na Loja', 'preco': '0.00', 'prazo': '1 dia útil', 'obs': 'Grátis'}]
+    # Lista fixa de opções de frete (pode alterar os valores aqui)
+    opcoes = [
+        {'servico': 'Retirada na Loja', 'preco': '0.00', 'prazo': '1 dia útil', 'obs': 'Grátis'},
+        {'servico': 'Frete Padrão', 'preco': '25.00', 'prazo': '5 a 8 dias', 'obs': 'Entrega Econômica'},
+        {'servico': 'Entrega Expressa', 'preco': '45.00', 'prazo': '2 a 3 dias', 'obs': 'Mais Rápido'}
+    ]
 
-    try:
-        url = "https://melhorenvio.com.br/api/v2/me/shipment/calculate"
-        headers = {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'Authorization': f'Bearer {TOKEN_MELHOR_ENVIO}',
-            'User-Agent': 'Loja Confiance'
-        }
-        # Payload fixo para teste (ajustar conforme necessidade real dos produtos)
-        payload = {
-            "from": {"postal_code": CEP_ORIGEM},
-            "to": {"postal_code": cep_destino},
-            "products": [{"id": "x", "width": 15, "height": 5, "length": 20, "weight": 0.3, "insurance_value": 50.0, "quantity": 1}]
-        }
-        
-        response = requests.post(url, json=payload, headers=headers, timeout=10)
-        
-        # --- DEBUG NO TERMINAL ---
-        if response.status_code != 200:
-            print(f"❌ ERRO MELHOR ENVIO (Status {response.status_code}):")
-            print(response.text)
-        # -------------------------
-
-        if response.status_code == 200:
-            dados_api = response.json()
-            for frete in dados_api:
-                # Lógica corrigida para ser case-insensitive
-                nome_empresa = frete.get('company', {}).get('name', '').lower()
-                
-                if "error" not in frete and "price" in frete and "correios" in nome_empresa:
-                    opcoes.append({
-                        'servico': frete['name'],
-                        'preco': f"{float(frete['price']):.2f}",
-                        'prazo': f"{frete['delivery_time']} dias",
-                        'obs': frete['company']['name']
-                    })
-        
-        return jsonify(opcoes)
-        
-    except Exception as e:
-        print(f"❌ EXCEÇÃO AO CALCULAR FRETE: {str(e)}")
-        # Fallback para não travar a venda
-        opcoes.append({'servico': 'PAC (Simulado)', 'preco': '25.90', 'prazo': '8 dias', 'obs': 'Correios'})
-        return jsonify(opcoes)
+    return jsonify(opcoes)
 
 if __name__ == '__main__':
     app.run(debug=True)
