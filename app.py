@@ -1,12 +1,19 @@
 import os
 from flask import Flask, render_template, request, jsonify
 import mercadopago
+from dotenv import load_dotenv  # IMPORTA A FERRAMENTA DE SEGURANÇA
+
+# CARREGA O COFRE (.ENV)
+load_dotenv()
 
 app = Flask(__name__)
 
-# --- CONFIGURAÇÕES ---
-# Token de Produção do Mercado Pago
-MP_ACCESS_TOKEN = "APP_USR-2045481871192189-112010-1b7034c359c46bcc392d95626b6bfdb0-269196602"
+# --- CONFIGURAÇÕES SEGURAS ---
+# Agora o Python busca a chave no cofre. Se não achar, avisa.
+MP_ACCESS_TOKEN = os.getenv("MP_ACCESS_TOKEN")
+
+if not MP_ACCESS_TOKEN:
+    print("⚠️ AVISO: Token do Mercado Pago não encontrado no arquivo .env")
 
 BASE_URL = os.getenv("SITE_URL", "http://localhost:5000")
 sdk = mercadopago.SDK(MP_ACCESS_TOKEN)
@@ -47,22 +54,23 @@ def favoritos():
 def sucesso():
     return render_template('sucesso.html')
 
-# --- API FRETE MANUAL (SEM MELHOR ENVIO) ---
+# --- API FRETE MANUAL ---
 @app.route('/api/calcular-frete', methods=['POST'])
 def calcular_frete():
-    # Apenas verifica se o CEP foi enviado
     data = request.get_json()
     cep_destino = data.get('cep', '').replace('-', '').replace('.', '')
     
     if not cep_destino or len(cep_destino) < 8:
         return jsonify({'erro': 'CEP inválido'}), 400
 
-    # AQUI VOCÊ PODE MUDAR OS VALORES FIXOS
     opcoes = [
         {'servico': 'PAC (Normal)', 'preco': '25.90', 'prazo': '5 a 10 dias', 'obs': 'Entrega Econômica'},
-        {'servico': 'SEDEX (Rápido)', 'preco': '48.50', 'prazo': '2 a 4 dias', 'obs': 'Mais Rápido'},
-        {'servico': 'Retirada na Loja', 'preco': '0.00', 'prazo': '1 dia útil', 'obs': 'Grátis'}
+        {'servico': 'SEDEX (Rápido)', 'preco': '48.50', 'prazo': '2 a 4 dias', 'obs': 'Mais Rápido'}
     ]
+
+    # Regra de Retirada na Loja (Santana de Mangueira)
+    if cep_destino == '58985000':
+        opcoes.append({'servico': 'Retirada na Loja', 'preco': '0.00', 'prazo': 'Disponível hoje', 'obs': 'Grátis'})
 
     return jsonify(opcoes)
 
@@ -70,6 +78,10 @@ def calcular_frete():
 @app.route('/api/checkout-mp', methods=['POST'])
 def criar_pagamento_mp():
     try:
+        # Verificação de Segurança Extra: Se não tiver token, não deixa vender
+        if not MP_ACCESS_TOKEN:
+            return jsonify({'erro': 'Erro de configuração no servidor (Token ausente)'}), 500
+
         dados = request.get_json()
         carrinho = dados.get('carrinho', [])
         frete_valor = float(dados.get('frete', 0))
@@ -119,4 +131,6 @@ def criar_pagamento_mp():
         return jsonify({'erro': str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Configuração segura de debug
+    debug_mode = os.getenv("FLASK_DEBUG", "False") == "True"
+    app.run(debug=debug_mode)

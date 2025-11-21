@@ -44,10 +44,8 @@
         .nav-right { display: flex; gap: 25px; align-items: center; flex-shrink: 0; }
         .icon-group { display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--texto-escuro); font-size: 0.85rem; line-height: 1.2; text-decoration: none; }
         .icon-group svg { width: 24px; height: 24px; stroke-width: 2; } 
-        .icon-text { display: block; font-weight: bold; }
-        .icon-sub { font-size: 0.75rem; font-weight: normal; display: block; color: #888; }
-        @media(max-width: 1000px) { .icon-text, .icon-sub { display: none; } }
         .btn-theme { background: none; border: none; cursor: pointer; font-size: 1.2rem; }
+        
         .category-bar { display: flex; justify-content: center; gap: 30px; padding: 15px 0; background-color: var(--fundo-card); border-bottom: 1px solid rgba(0,0,0,0.05); box-shadow: 0 2px 5px rgba(0,0,0,0.02); font-size: 0.85rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; overflow-x: auto; white-space: nowrap; }
         .cat-link { color: var(--texto-escuro); text-decoration: none; padding: 5px 0; transition: color 0.2s; }
         .cat-link:hover { color: var(--rosa-antigo); } .cat-link.highlight { color: #D32F2F; }
@@ -82,13 +80,16 @@
         .frete-calculator { margin: 25px 0; border-top: 1px dashed #ddd; border-bottom: 1px dashed #ddd; padding: 20px 0; }
         .cep-input-group { display: flex; gap: 5px; margin-bottom: 10px; }
         #cep-carrinho { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px; background: white; color: var(--texto-escuro); }
-        .btn-ok-frete { background: var(--texto-escuro); color: white; border: none; padding: 0 20px; border-radius: 4px; cursor: pointer; font-weight: bold; }
         
-        .frete-options { margin-top: 15px; display: flex; flex-direction: column; gap: 10px; max-height: 200px; overflow-y: auto; }
-        .frete-radio-label { display: flex; justify-content: space-between; cursor: pointer; align-items: center; padding: 10px; border-radius: 4px; transition: background 0.2s; font-size: 0.9rem; border: 1px solid transparent; }
+        /* Botão OK oculto */
+        .btn-ok-frete { display: none; }
+        
+        .frete-options { margin-top: 15px; display: flex; flex-direction: column; gap: 10px; max-height: 300px; overflow-y: auto; }
+        .frete-radio-label { display: flex; flex-direction: column; cursor: pointer; padding: 10px; border-radius: 4px; transition: background 0.2s; font-size: 0.9rem; border: 1px solid transparent; }
         .frete-radio-label:hover { background: rgba(0,0,0,0.03); border-color: #eee; }
+        .frete-content { display: flex; justify-content: space-between; align-items: center; width: 100%; }
         .frete-radio-label input { margin-right: 10px; accent-color: var(--rosa-antigo); }
-
+        
         .summary-total { display: flex; justify-content: space-between; margin-top: 20px; padding-top: 20px; border-top: 1px solid #ddd; font-weight: bold; font-size: 1.6rem; color: var(--rosa-antigo); font-family: 'Cormorant Garamond', serif; }
 
         .btn-checkout { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 18px; margin-top: 15px; background-color: var(--verde-zap); color: white; border: none; border-radius: 30px; text-transform: uppercase; font-weight: bold; letter-spacing: 1px; cursor: pointer; transition: 0.3s; font-size: 1rem; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3); }
@@ -157,7 +158,7 @@
     </div>
 
     <footer>
-        <p>CATRACA GROUP &copy; 2025</p>
+        <p>CATRACA GROUP © 2025</p>
         <p class="orcamento">Faça seu orçamento de site conosco! <a href="https://wa.me/5583987922924" target="_blank">Entre em contato</a></p>
     </footer>
 
@@ -166,6 +167,7 @@
         let carrinhoAtual = JSON.parse(localStorage.getItem('carrinho_confiance') || '[]');
         let freteSelecionado = 0; 
         let freteNome = "";
+        let opcoesFreteCache = []; 
 
         function renderCart() {
             const container = document.getElementById('cart-content');
@@ -194,7 +196,7 @@
             });
             itemsHTML += '</div>';
 
-            let textoFreteResumo = 'A calcular';
+            let textoFreteResumo = freteSelecionado > 0 ? `R$ ${freteSelecionado.toFixed(2)}` : 'A calcular';
             let areaFreteHTML = '';
 
             // Regra de Frete Grátis Visual
@@ -202,16 +204,40 @@
                 freteSelecionado = 0; freteNome = "Frete Grátis"; textoFreteResumo = '<span style="color:green; font-weight:bold">GRÁTIS</span>';
                 areaFreteHTML = `<div style="margin:20px 0; padding:15px; background:#E8F5E9; color:#2E7D32; border-radius:4px; text-align:center;">🎉 <strong>Parabéns!</strong> Frete Grátis garantido.</div>`;
             } else {
-                textoFreteResumo = freteSelecionado > 0 ? `R$ ${freteSelecionado.toFixed(2)}` : 'A calcular';
+                // Geração da lista de frete
+                let htmlOpcoes = '';
+                if (opcoesFreteCache.length > 0) {
+                    opcoesFreteCache.forEach((opt) => {
+                        let precoFloat = parseFloat(opt.preco);
+                        let checked = (precoFloat === freteSelecionado && freteNome === opt.servico) ? 'checked' : '';
+                        
+                        htmlOpcoes += `
+                        <label class="frete-radio-label">
+                            <div class="frete-content">
+                                <div style="display:flex; align-items:center">
+                                    <input type="radio" name="frete" value="${precoFloat}" data-nome="${opt.servico}" onchange="selecionarFrete(this)" ${checked}>
+                                    <div>
+                                        <strong style="display:block">${opt.servico}</strong> 
+                                        <small style="color:#666">${opt.prazo} (${opt.obs})</small>
+                                    </div>
+                                </div>
+                                <div style="font-weight:bold; color:var(--rosa-antigo)">${precoFloat === 0 ? 'Grátis' : 'R$ '+precoFloat.toFixed(2)}</div>
+                            </div>
+                        </label>`;
+                    });
+                } else {
+                    htmlOpcoes = '<span style="color:#999; font-style:italic; font-size:0.9rem;">Insira o CEP para ver opções.</span>';
+                }
+
                 areaFreteHTML = `
                     <div class="frete-calculator">
                         <label style="font-size:0.9rem; font-weight:bold;">Calcular Frete:</label>
                         <div class="cep-input-group">
-                            <input type="text" id="cep-carrinho" placeholder="Digite seu CEP" maxlength="9">
+                            <input type="text" id="cep-carrinho" placeholder="Digite seu CEP" maxlength="9" value="${document.getElementById('cep-carrinho') ? document.getElementById('cep-carrinho').value : ''}">
                             <button class="btn-ok-frete" onclick="calcularFreteCarrinho()">OK</button>
                         </div>
                         <div id="opcoes-frete" class="frete-options">
-                            ${freteSelecionado > 0 ? '<span style="color:green">Frete selecionado: R$ ' + freteSelecionado.toFixed(2) + ' ('+ freteNome +')</span>' : '<span style="color:#999; font-style:italic; font-size:0.9rem;">Insira o CEP para ver opções.</span>'}
+                            ${htmlOpcoes}
                         </div>
                     </div>
                 `;
@@ -242,14 +268,22 @@
 
             container.innerHTML = itemsHTML + summaryHTML;
             
-            // Máscara CEP
+            // Eventos de CEP
             const cepInput = document.getElementById('cep-carrinho');
             if(cepInput){
+                if(cepInput.value.length > 0) cepInput.focus();
+
                 cepInput.addEventListener('keypress', (e) => { if(cepInput.value.length == 5 && e.key !== '-') cepInput.value += '-'; });
                 cepInput.addEventListener('input', function() {
                    let val = this.value.replace(/\D/g, '');
                    if (val.length > 5) val = val.slice(0,5) + '-' + val.slice(5,8);
                    this.value = val;
+                   
+                   // Cálculo Automático
+                   if (val.length === 9) {
+                       calcularFreteCarrinho();
+                       this.blur(); 
+                   }
                 });
             }
         }
@@ -260,16 +294,15 @@
             freteSelecionado = 0; renderCart(); 
         }
 
-        // --- CÁLCULO MANUAL (SIMPLE) ---
+        // --- CÁLCULO MANUAL ---
         async function calcularFreteCarrinho() {
             const cep = document.getElementById('cep-carrinho').value;
             const divOpcoes = document.getElementById('opcoes-frete');
             
-            if (cep.length < 9) { alert("Digite um CEP válido."); return; }
+            if (cep.length < 9) return;
             divOpcoes.innerHTML = '<span style="color:#888">Consultando...</span>';
 
             try {
-                // Agora enviamos apenas o CEP para a rota simplificada
                 const response = await fetch('/api/calcular-frete', { 
                     method: 'POST', 
                     headers: {'Content-Type': 'application/json'}, 
@@ -283,22 +316,8 @@
                     return; 
                 }
 
-                let html = '';
-                opcoes.forEach((opt) => {
-                    let precoFloat = parseFloat(opt.preco);
-                    html += `
-                    <label class="frete-radio-label">
-                        <div style="display:flex; align-items:center">
-                            <input type="radio" name="frete" value="${precoFloat}" data-nome="${opt.servico}" onchange="selecionarFrete(this)">
-                            <div>
-                                <strong style="display:block">${opt.servico}</strong> 
-                                <small style="color:#666">${opt.prazo} (${opt.obs})</small>
-                            </div>
-                        </div>
-                        <div style="font-weight:bold; color:var(--rosa-antigo)">${precoFloat === 0 ? 'Grátis' : 'R$ '+precoFloat.toFixed(2)}</div>
-                    </label>`;
-                });
-                divOpcoes.innerHTML = html;
+                opcoesFreteCache = opcoes; // Salva para não sumir ao clicar
+                renderCart();
 
             } catch (e) { 
                 divOpcoes.innerHTML = "Erro ao calcular."; 
