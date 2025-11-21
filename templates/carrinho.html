@@ -30,7 +30,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; transition: background-color 0.3s, color 0.3s; }
         body { font-family: 'Lato', sans-serif; color: var(--texto-escuro); background-color: var(--fundo-site); }
 
-        /* HEADER IGUAL À HOME */
+        /* HEADER PADRÃO */
         .top-bar { background-color: black; color: white; text-align: center; padding: 8px 0; font-size: 0.85rem; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; }
         nav { display: flex; justify-content: space-between; align-items: center; padding: 15px 5%; background-color: var(--fundo-card); border-bottom: 1px solid rgba(0,0,0,0.05); gap: 30px; position: sticky; top: 0; z-index: 100; }
         .brand-link { display: flex; align-items: center; gap: 12px; text-decoration: none; flex-shrink: 0; }
@@ -205,13 +205,13 @@
                 textoFreteResumo = freteSelecionado > 0 ? `R$ ${freteSelecionado.toFixed(2)}` : 'A calcular';
                 areaFreteHTML = `
                     <div class="frete-calculator">
-                        <label style="font-size:0.9rem; font-weight:bold;">Calcular Frete (Melhor Envio):</label>
+                        <label style="font-size:0.9rem; font-weight:bold;">Calcular Frete:</label>
                         <div class="cep-input-group">
                             <input type="text" id="cep-carrinho" placeholder="Digite seu CEP" maxlength="9">
                             <button class="btn-ok-frete" onclick="calcularFreteCarrinho()">OK</button>
                         </div>
                         <div id="opcoes-frete" class="frete-options">
-                            ${freteSelecionado > 0 ? '<span style="color:green">Frete selecionado: R$ ' + freteSelecionado.toFixed(2) + ' ('+ freteNome +')</span>' : '<span style="color:#999; font-style:italic; font-size:0.9rem;">Insira o CEP para ver transportadoras.</span>'}
+                            ${freteSelecionado > 0 ? '<span style="color:green">Frete selecionado: R$ ' + freteSelecionado.toFixed(2) + ' ('+ freteNome +')</span>' : '<span style="color:#999; font-style:italic; font-size:0.9rem;">Insira o CEP para ver opções.</span>'}
                         </div>
                     </div>
                 `;
@@ -242,7 +242,7 @@
 
             container.innerHTML = itemsHTML + summaryHTML;
             
-            // Re-atribuir evento de máscara do CEP
+            // Máscara CEP
             const cepInput = document.getElementById('cep-carrinho');
             if(cepInput){
                 cepInput.addEventListener('keypress', (e) => { if(cepInput.value.length == 5 && e.key !== '-') cepInput.value += '-'; });
@@ -250,7 +250,6 @@
                    let val = this.value.replace(/\D/g, '');
                    if (val.length > 5) val = val.slice(0,5) + '-' + val.slice(5,8);
                    this.value = val;
-                   if (val.length === 9) calcularFreteCarrinho();
                 });
             }
         }
@@ -261,26 +260,26 @@
             freteSelecionado = 0; renderCart(); 
         }
 
-        // --- LÓGICA DE CÁLCULO INTEGRADA AO BACKEND ---
+        // --- CÁLCULO MANUAL (SIMPLE) ---
         async function calcularFreteCarrinho() {
             const cep = document.getElementById('cep-carrinho').value;
             const divOpcoes = document.getElementById('opcoes-frete');
             
-            if (cep.length < 8) return;
-            divOpcoes.innerHTML = '<span style="color:#888">Consultando transportadoras...</span>';
+            if (cep.length < 9) { alert("Digite um CEP válido."); return; }
+            divOpcoes.innerHTML = '<span style="color:#888">Consultando...</span>';
 
             try {
-                // IMPORTANTE: Agora enviamos o carrinho junto com o CEP
+                // Agora enviamos apenas o CEP para a rota simplificada
                 const response = await fetch('/api/calcular-frete', { 
                     method: 'POST', 
                     headers: {'Content-Type': 'application/json'}, 
-                    body: JSON.stringify({ cep: cep, carrinho: carrinhoAtual }) 
+                    body: JSON.stringify({ cep: cep }) 
                 });
                 
                 const opcoes = await response.json();
                 
-                if(opcoes.length === 0 || opcoes.erro) { 
-                    divOpcoes.innerHTML = "<span style='color:red'>CEP não encontrado ou sem entregas disponíveis.</span>"; 
+                if(opcoes.erro) { 
+                    divOpcoes.innerHTML = `<span style='color:red'>${opcoes.erro}</span>`; 
                     return; 
                 }
 
@@ -293,29 +292,28 @@
                             <input type="radio" name="frete" value="${precoFloat}" data-nome="${opt.servico}" onchange="selecionarFrete(this)">
                             <div>
                                 <strong style="display:block">${opt.servico}</strong> 
-                                <small style="color:#666">${opt.prazo}</small>
+                                <small style="color:#666">${opt.prazo} (${opt.obs})</small>
                             </div>
                         </div>
-                        <div style="font-weight:bold; color:var(--rosa-antigo)">R$ ${precoFloat.toFixed(2)}</div>
+                        <div style="font-weight:bold; color:var(--rosa-antigo)">${precoFloat === 0 ? 'Grátis' : 'R$ '+precoFloat.toFixed(2)}</div>
                     </label>`;
                 });
                 divOpcoes.innerHTML = html;
 
             } catch (e) { 
-                console.error(e);
-                divOpcoes.innerHTML = "Erro ao calcular frete."; 
+                divOpcoes.innerHTML = "Erro ao calcular."; 
             }
         }
 
         window.selecionarFrete = function(radio) {
             freteSelecionado = parseFloat(radio.value);
             freteNome = radio.getAttribute('data-nome');
-            renderCart(); // Atualiza o total com o frete escolhido
+            renderCart(); 
         };
 
         window.finalizarWhatsApp = function(subtotalInicial) {
             if (carrinhoAtual.length === 0) return;
-            if (subtotalInicial < 279 && freteSelecionado === 0) { alert("Por favor, selecione uma opção de frete."); return; }
+            if (subtotalInicial < 279 && freteSelecionado === 0 && freteNome === "") { alert("Por favor, selecione uma opção de frete."); return; }
             
             let msg = "*Novo Pedido - Confiance*\n----------------\n";
             carrinhoAtual.forEach(i => msg += `▪ ${i.nome} (${i.corSelecionada || 'Padrão'}) - R$ ${i.preco.toFixed(2)}\n`);
@@ -327,7 +325,7 @@
         };
 
         window.finalizarMercadoPago = async function(subtotalInicial) {
-            if (subtotalInicial < 279 && freteSelecionado === 0) { 
+            if (subtotalInicial < 279 && freteSelecionado === 0 && freteNome === "") { 
                 alert("Por favor, calcule e selecione o frete antes de pagar."); 
                 return; 
             }
